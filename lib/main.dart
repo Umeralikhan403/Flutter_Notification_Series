@@ -69,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
           child: ElevatedButton(
         onPressed: () =>
-            LocalNotification.showIndeterminateProgressNotification,
+            LocalNotification.showIndeterminateProgressNotification(19),
         child: const Text('ProgressBar Notification'),
       )),
       // body: Center(

@@ -76,7 +76,7 @@ class NotificationController extends ChangeNotifier {
 
     print("receivedAction : $receivedAction");
 
-    // navigateHelper(receivedAction);
+    navigateHelper(receivedAction);
     // if (receivedAction.buttonKeyPressed == "SUBSCRIBE") {
     //   print("Subscribe button is pressed");
     // } else if (receivedAction.buttonKeyPressed == "DISMISS") {
