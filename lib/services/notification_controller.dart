@@ -144,7 +144,7 @@ class NotificationController extends ChangeNotifier {
   }
 
   //////// This method is call when a given cause the app launch
-  ///   Note the app  was terminated
+  ////////   Note the app  was terminated
   static Future<void> getInitialNotificationAction() async {
     ReceivedAction? receivedAction = await AwesomeNotifications()
         .getInitialNotificationAction(removeFromActionEvents: true);

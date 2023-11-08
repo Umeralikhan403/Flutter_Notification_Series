@@ -1,13 +1,10 @@
 import 'dart:async';
-
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_notifications/services/local_notifications.dart';
+import 'package:flutter_notifications/local_notifications_screen.dart';
 import 'package:flutter_notifications/services/notification_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await NotificationController.initializeLocalNotification(debug: true);
   await NotificationController.initializeNotificationEventListeners();
   scheduleMicrotask(() async {
@@ -48,73 +45,46 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   @override
-  void initState() {
-    AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
-      if (!isAllowed) {
-        AwesomeNotifications().requestPermissionToSendNotifications();
-      }
-    });
-
-    NotificationController.initializeNotificationEventListeners();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        shape: const CircularAppBarShape(),
+        title: const Text("Local Notifications"),
       ),
-      body: Center(
-          child: ElevatedButton(
-        onPressed: () =>
-            LocalNotification.showIndeterminateProgressNotification(19),
-        child: const Text('ProgressBar Notification'),
-      )),
-      // body: Center(
-      //   child: ElevatedButton(
-      //     onPressed: () => LocalNotification.createMessagingNotification(
-      //       channelKey: 'chats',
-      //       groupKey: 'Emma_group',
-      //       chatName: 'Emma Group',
-      //       userName: 'Emma',
-      //       message: 'Emma has sent a message',
-      //       largeIcon: 'asset://assets/profile_photo.jpg',
-      //     ),
-      //     child: const Text("Chat Notification"),
-      //   ),
-      // ),
-      // body: Center(
-      //   child: ElevatedButton(
-      //     onPressed: () =>
-      //         LocalNotification.createBasicNotificationWithPayload(),
-      //     child: const Text("Trigger Notification"),
-      //   ),
-      // ),
-      // body: Center(
-      //     child: ElevatedButton(
-      //   onPressed: () => LocalNotification.showNotificationWithActionButton(10),
-      //   child: const Text("Action Notifications"),
-      // )),
-      // body: Column(
-      //   mainAxisAlignment: MainAxisAlignment.center,
-      //   children: [
-      //     const ElevatedButton(
-      //       onPressed: LocalNotification.scheduleNotification,
-      //       child: Text("Schedule Notifications"),
-      //     ),
-      //     ElevatedButton(
-      //       onPressed: () => LocalNotification.cancelScheduleNotification(10),
-      //       child: const Text("Cancel Schedule Notifications"),
-      //     )
-      //   ],
-      // )
-      // Center(
-      //     child: ElevatedButton(
-      //   onPressed: triggerNotification,
-      //   child: const Text("Trigger Notifications"),
-      // )),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Column(
+            children: [
+              Center(
+                  child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const LocalNotificationsScreen()));
+                },
+                child: const Text('Local Notifications'),
+              )),
+              const SizedBox(height: 20),
+              Center(
+                  child: ElevatedButton(
+                onPressed: () {},
+                child: const Text('Remote Notification'),
+              )),
+              const SizedBox(height: 20),
+              Center(
+                  child: ElevatedButton(
+                onPressed: () {},
+                child: const Text('Media Notification'),
+              )),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
