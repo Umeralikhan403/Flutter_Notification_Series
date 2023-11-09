@@ -1,4 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_notifications/main.dart';
 import 'package:flutter_notifications/services/local_notifications.dart';
@@ -23,7 +25,7 @@ class NotificationController extends ChangeNotifier {
 
   NotificationController._internal();
 
-  //// Initialization Method
+  /////////////// Initialization Local Notification ///////////////////
   static Future<void> initializeLocalNotification({required bool debug}) async {
     await AwesomeNotifications().initialize(
         null,
@@ -57,7 +59,31 @@ class NotificationController extends ChangeNotifier {
         debug: debug);
   }
 
-  ///// Event Listener
+//////// This method is call when a given cause the app launch
+  ////////   Note the app  was terminated
+  static Future<void> getInitialNotificationAction() async {
+    ReceivedAction? receivedAction = await AwesomeNotifications()
+        .getInitialNotificationAction(removeFromActionEvents: true);
+
+    if (receivedAction == null) return;
+
+    navigateHelper(receivedAction);
+  }
+
+  /////////////// Initialization Remote Notification ///////////////////
+  static Future<void> initializeRemoteNotification(
+      {required bool debug}) async {
+    await Firebase.initializeApp();
+    await AwesomeNotificationsFcm().initialize(
+      onFcmTokenHandle: NotificationController.myFCMTokenHandle,
+      onFcmSilentDataHandle: NotificationController.mySilentDataHandle,
+      onNativeTokenHandle: NotificationController.myNativeTokenHandle,
+      licenseKeys: [],
+      debug: debug,
+    );
+  }
+
+  ///// Event Listener ///////
   static Future<void> initializeNotificationEventListeners() async {
     await AwesomeNotifications().setListeners(
         onActionReceivedMethod: onActionReceivedMethod,
@@ -143,14 +169,53 @@ class NotificationController extends ChangeNotifier {
         gravity: ToastGravity.BOTTOM);
   }
 
-  //////// This method is call when a given cause the app launch
-  ////////   Note the app  was terminated
-  static Future<void> getInitialNotificationAction() async {
-    ReceivedAction? receivedAction = await AwesomeNotifications()
-        .getInitialNotificationAction(removeFromActionEvents: true);
+  ///////////// Remote notificatiion event listener //////////////
 
-    if (receivedAction == null) return;
+  ///// use this method to execute on background when a silent data arrives
+  ///  {// even while terminated}
+  static Future<void> mySilentDataHandle(FcmSilentData silentData) async {
+    Fluttertoast.showToast(
+        msg: "Silent date received",
+        backgroundColor: Colors.blueAccent,
+        textColor: Colors.white,
+        fontSize: 16);
 
-    navigateHelper(receivedAction);
+    print('SilentData: ${silentData.data}');
+  }
+
+///// use this method to detect when a new fcm token is received
+  static Future<void> myFCMTokenHandle(String token) async {
+    Fluttertoast.showToast(
+        msg: "FCM Token received",
+        backgroundColor: Colors.blueAccent,
+        textColor: Colors.white,
+        fontSize: 16);
+
+    print('Firebase token: $token');
+  }
+
+///// use this method to detect when a new native token is received
+  static Future<void> myNativeTokenHandle(String token) async {
+    Fluttertoast.showToast(
+        msg: "Native Token received",
+        backgroundColor: Colors.blueAccent,
+        textColor: Colors.white,
+        fontSize: 16);
+
+    print('Native token: $token');
+  }
+
+//////////// request firebase token //////////////
+  static Future<String> requestFirebaseToken() async {
+    if (await AwesomeNotificationsFcm().isFirebaseAvailable) {
+      try {
+        AwesomeNotificationsFcm().requestFirebaseAppToken();
+      } catch (e) {
+        debugPrint('$e');
+      }
+    } else {
+      debugPrint('Firebase is not available for this project');
+    }
+    return '';
   }
 }
