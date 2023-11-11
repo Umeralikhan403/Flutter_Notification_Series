@@ -242,4 +242,21 @@ class LocalNotification {
       wakeUpScreen: true,
     ));
   }
+
+  /////////// Live Score Notification notification /////////////
+  static Future<void> createLiveScoreNotification(
+      {required int id,
+      required String title,
+      required String body,
+      String? largeIcon}) async {
+    await Future.delayed(const Duration(seconds: 5));
+    AwesomeNotifications().createNotification(
+        content: NotificationContent(
+      id: id,
+      channelKey: 'basic_channel',
+      title: title,
+      body: body,
+      largeIcon: largeIcon,
+    ));
+  }
 }

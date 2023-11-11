@@ -71,67 +71,59 @@ class _MyHomePageState extends State<MyHomePage> {
         shape: const CircularAppBarShape(),
         title: const Text("Local Notifications"),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Column(
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
             children: [
-              Center(
-                  child: ElevatedButton(
+              ElevatedButton(
+                onPressed: () =>
+                    NotificationController.subscribeToTopic('Anime'),
+                child: const Text('Subscribe to topic'),
+              ),
+              ElevatedButton(
+                onPressed: () =>
+                    NotificationController.unSubscribeToTopic('Anime'),
+                child: const Text('UnSubscribe to topic'),
+              ),
+              /////////////////////////////////////////////////////////////////////
+              ElevatedButton(
                 onPressed: () => LocalNotification.showEmojiNotification(3),
                 child: const Text('Emoji Notification'),
-              )),
-              Center(
-                  child: ElevatedButton(
+              ),
+              ElevatedButton(
                 onPressed: () => LocalNotification.wakeUpNotification(4),
                 child: const Text('Wake Up lock screen Notification'),
-              )),
-            ],
-          ),
-          Column(
-            children: [
-              Center(
-                  child: ElevatedButton(
+              ),
+              ElevatedButton(
                 onPressed: () =>
                     LocalNotification.showIndeterminateProgressNotification(19),
                 child: const Text('ProgressBar Notification'),
-              )),
-              Center(
-                  child: ElevatedButton(
+              ),
+              ElevatedButton(
                 onPressed: () => LocalNotification.showProgressNotification(2),
                 child: const Text('Downloading File Notification'),
-              )),
-            ],
-          ),
-          Center(
-            child: ElevatedButton(
-              onPressed: () => LocalNotification.createMessagingNotification(
-                channelKey: 'chats',
-                groupKey: 'Emma_group',
-                chatName: 'Emma Group',
-                userName: 'Emma',
-                message: 'Emma has sent a message',
-                largeIcon: 'asset://assets/profile_photo.jpg',
               ),
-              child: const Text("Chat Notification"),
-            ),
-          ),
-          Center(
-            child: ElevatedButton(
-              onPressed: () =>
-                  LocalNotification.createBasicNotificationWithPayload(),
-              child: const Text("Trigger Notification"),
-            ),
-          ),
-          Center(
-              child: ElevatedButton(
-            onPressed: () =>
-                LocalNotification.showNotificationWithActionButton(10),
-            child: const Text("Action Notifications"),
-          )),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+              ElevatedButton(
+                onPressed: () => LocalNotification.createMessagingNotification(
+                  channelKey: 'chats',
+                  groupKey: 'Emma_group',
+                  chatName: 'Emma Group',
+                  userName: 'Emma',
+                  message: 'Emma has sent a message',
+                  largeIcon: 'asset://assets/profile_photo.jpg',
+                ),
+                child: const Text("Chat Notification"),
+              ),
+              ElevatedButton(
+                onPressed: () =>
+                    LocalNotification.createBasicNotificationWithPayload(),
+                child: const Text("Trigger Notification"),
+              ),
+              ElevatedButton(
+                onPressed: () =>
+                    LocalNotification.showNotificationWithActionButton(10),
+                child: const Text("Action Notifications"),
+              ),
               const ElevatedButton(
                 onPressed: LocalNotification.scheduleNotification,
                 child: Text("Schedule Notifications"),
@@ -140,15 +132,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 onPressed: () =>
                     LocalNotification.cancelScheduleNotification(10),
                 child: const Text("Cancel Schedule Notifications"),
-              )
+              ),
+              ElevatedButton(
+                onPressed: () => LocalNotification.triggerNotification,
+                child: const Text("Trigger Notifications"),
+              ),
             ],
           ),
-          const Center(
-              child: ElevatedButton(
-            onPressed: LocalNotification.triggerNotification,
-            child: Text("Trigger Notifications"),
-          )),
-        ],
+        ),
       ),
     );
   }

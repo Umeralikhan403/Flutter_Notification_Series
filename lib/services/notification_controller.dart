@@ -1,6 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_notifications/main.dart';
 import 'package:flutter_notifications/services/local_notifications.dart';
@@ -13,6 +14,10 @@ navigateHelper(ReceivedAction receivedAction) {
     MyApp.navigatorKey.currentState!
         .push(MaterialPageRoute(builder: (context) => const TempScreen()));
   }
+}
+
+Future<void> _bgMessageHandler(RemoteMessage remoteMessage) async {
+  print('Background message ${remoteMessage.toMap()}');
 }
 
 class NotificationController extends ChangeNotifier {
@@ -74,13 +79,35 @@ class NotificationController extends ChangeNotifier {
   static Future<void> initializeRemoteNotification(
       {required bool debug}) async {
     await Firebase.initializeApp();
-    await AwesomeNotificationsFcm().initialize(
-      onFcmTokenHandle: NotificationController.myFCMTokenHandle,
-      onFcmSilentDataHandle: NotificationController.mySilentDataHandle,
-      onNativeTokenHandle: NotificationController.myNativeTokenHandle,
-      licenseKeys: [],
-      debug: debug,
-    );
+
+    FirebaseMessaging.onBackgroundMessage(_bgMessageHandler);
+
+    FirebaseMessaging.onMessage.listen(NotificationController.onMessageLister);
+
+    FirebaseMessaging.onMessageOpenedApp
+        .listen(NotificationController.onMessageOpenedAppListner);
+    // await AwesomeNotificationsFcm().initialize(
+    //   onFcmTokenHandle: NotificationController.myFCMTokenHandle,
+    //   onFcmSilentDataHandle: NotificationController.mySilentDataHandle,
+    //   onNativeTokenHandle: NotificationController.myNativeTokenHandle,
+    //   licenseKeys: [],
+    //   debug: debug,
+    // );
+  }
+
+  static getFcmToken() async {
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    print('fcmToken $fcmToken');
+  }
+
+/////////////////
+  static onMessageLister(RemoteMessage remoteMessage) {
+    print("onMessage received ${remoteMessage.toMap()}");
+  }
+
+/////////////////
+  static onMessageOpenedAppListner(RemoteMessage remoteMessage) {
+    print("onMessageOpenedAppListner received ${remoteMessage.toMap()}");
   }
 
   ///// Event Listener ///////
@@ -181,6 +208,21 @@ class NotificationController extends ChangeNotifier {
         fontSize: 16);
 
     print('SilentData: ${silentData.data}');
+
+    if (silentData.data!['IsLiveScore'] == "true") {
+      LocalNotification.createLiveScoreNotification(
+        id: 1,
+        title: silentData.data!['title']!,
+        body: silentData.data!['body']!,
+        largeIcon: silentData.data!['largeIcon'],
+      );
+    }
+
+    if (silentData.createdLifeCycle == NotificationLifeCycle.Foreground) {
+      print("ForeGround");
+    } else {
+      print("Background");
+    }
   }
 
 ///// use this method to detect when a new fcm token is received
@@ -217,5 +259,16 @@ class NotificationController extends ChangeNotifier {
       debugPrint('Firebase is not available for this project');
     }
     return '';
+  }
+
+///////////  Subscribe or Unsubscribe to topic
+  static Future<void> subscribeToTopic(String topic) async {
+    await AwesomeNotificationsFcm().subscribeToTopic(topic);
+    print('Subscribe to $topic');
+  }
+
+  static Future<void> unSubscribeToTopic(String topic) async {
+    await AwesomeNotificationsFcm().unsubscribeToTopic(topic);
+    print('UbSubscribe to $topic');
   }
 }
